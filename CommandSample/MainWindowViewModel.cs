@@ -19,6 +19,9 @@ namespace CommandSample {
 			WireCommands();
 		}
 
+		/// <summary>
+		/// Command를 엮어준다
+		/// </summary>
 		private void WireCommands()
 		{
 			ShowMessageBoxCommand = 
@@ -31,6 +34,9 @@ namespace CommandSample {
 
 		public AsyncRelayCommand WriteLogCommand { get; private set; }
 
+		/// <summary>
+		/// MainWindow의 LogList에 바인딩 될 property
+		/// </summary>
 		public ObservableCollection<string> LogList {
 			get { return _logList; }
 			set {
@@ -41,12 +47,21 @@ namespace CommandSample {
 			}
 		}
 
+		/// <summary>
+		/// 메시지박스 출력
+		/// </summary>
+		/// <param name="arg"></param>
 		private void ShowMessageBoxCommandHandler(object arg)
 		{
 			MessageBox.Show("메시지 상자 출력", "Command 예제", 
 				MessageBoxButton.OK, MessageBoxImage.Information);
 		}
 
+		/// <summary>
+		/// 비동기로 2초에 걸쳐 3개의 로그를 작성
+		/// </summary>
+		/// <param name="arg"></param>
+		/// <returns></returns>
 		private Task WriteLogCommandHandler(object arg)
 		{
 			int numBgn = _logList.Count + 1;

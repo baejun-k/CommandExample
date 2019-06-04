@@ -2,13 +2,20 @@
 using System.Windows.Input;
 
 namespace CommandSample.Commands {
+	/// <summary>
+	/// 일반적인 Command
+	/// </summary>
 	public class RelayCommand : ICommand {
 		private readonly Action<object> _handler;
 		private bool _canExecute = true;
 
-		public RelayCommand(Action<object> task)
+		/// <summary>
+		/// 특정 행동을 하는 핸들러를 받아 생성
+		/// </summary>
+		/// <param name="handler"></param>
+		public RelayCommand(Action<object> handler)
 		{
-			_handler = task;
+			_handler = handler;
 		}
 
 		private void SetCanExecute(bool canExecute)
@@ -25,17 +32,10 @@ namespace CommandSample.Commands {
 
 		public void Execute(object parameter)
 		{
-			try {
-				if (CanExecute(null) == false) { return; }
-				SetCanExecute(false);
-				_handler?.Invoke(parameter);
-			}
-			catch (Exception) {
-				// TODO: 예외처리 해줄게 있으면 해준다.
-			}
-			finally {
-				SetCanExecute(true);
-			}
+			if (CanExecute(null) == false) { return; }
+			SetCanExecute(false);
+			_handler?.Invoke(parameter);
+			SetCanExecute(true);
 		}
 	}
 }

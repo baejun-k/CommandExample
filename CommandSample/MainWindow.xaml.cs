@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace CommandSample {
 	/// <summary>
@@ -13,6 +8,13 @@ namespace CommandSample {
 		public MainWindow()
 		{
 			InitializeComponent();
+		}
+
+		/// <summary>
+		/// 만약 MainWindow의 ViewModel에 접근해야한다면 사용
+		/// </summary>
+		public MainWindowViewModel ViewModel {
+			get { return this.DataContext as MainWindowViewModel; }
 		}
 	}
 }

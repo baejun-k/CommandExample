@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CommandSample"
         mc:Ignorable="d"
         Title="Command Sample" Height="450" Width="800">
+	<!-- ViewModel -->
 	<Window.DataContext>
 		<local:MainWindowViewModel/>
 	</Window.DataContext>
@@ -17,13 +18,16 @@
 		</Grid.ColumnDefinitions>
 		
 		<StackPanel>
+			<!-- MessageBox를 띄워주는 버튼 -->
 			<Button Content="Command Button"
 					Command="{Binding ShowMessageBoxCommand}"/>
+			<!-- 로그를 3개 작성하는 버튼 -->
 			<Button Content="Async Command Button"
 					Command="{Binding WriteLogCommand}"
 					Margin="0,5,0,0"/>
 		</StackPanel>
 
+		<!-- 로그를 표현해주는 리스트박스 -->
 		<ListBox x:Name="listboxLog"
 				 ItemsSource="{Binding Path=LogList}"
 				 Margin="5,0,0,0"
