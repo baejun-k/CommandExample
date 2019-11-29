@@ -7,35 +7,36 @@ namespace CommandSample.Commands {
 	/// </summary>
 	public class RelayCommand : ICommand {
 		private readonly Action<object> _handler;
-		private bool _canExecute = true;
+		private bool _isRunning;
+		private Func<object, bool> _canExecuteCompare;
 
 		/// <summary>
 		/// 특정 행동을 하는 핸들러를 받아 생성
 		/// </summary>
 		/// <param name="handler"></param>
-		public RelayCommand(Action<object> handler)
+		public RelayCommand(Action<object> handler, Func<object, bool> canExecuteCompare = null)
 		{
 			_handler = handler;
-		}
-
-		private void SetCanExecute(bool canExecute)
-		{
-			if (_canExecute != canExecute) {
-				_canExecute = canExecute;
-				CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-			}
+			_canExecuteCompare = canExecuteCompare;
+			_isRunning = false;
 		}
 
 		public event EventHandler CanExecuteChanged;
 
-		public bool CanExecute(object parameter) => _canExecute;
+		public bool CanExecute(object parameter)
+		{
+			return !_isRunning && (_canExecuteCompare?.Invoke(parameter) ?? true);
+		}
 
 		public void Execute(object parameter)
 		{
-			if (CanExecute(null) == false) { return; }
-			SetCanExecute(false);
-			_handler?.Invoke(parameter);
-			SetCanExecute(true);
+			if (CanExecute(parameter)) {
+				_isRunning = true;
+				CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+				_handler?.Invoke(parameter);
+				_isRunning = false;
+				CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+			}
 		}
 	}
 }

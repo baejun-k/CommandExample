@@ -8,62 +8,35 @@ namespace CommandSample.Commands {
 	/// </summary>
 	public class AsyncRelayCommand : ICommand {
 		private readonly Func<object, Task> _handler;
-		private bool _canExecute = true;
+		private bool _isRunning;
+		private Func<object, bool> _canExecuteCompare;
 
 		/// <summary>
 		/// 특정 행동을 하는 핸들러를 받아 생성
 		/// </summary>
 		/// <param name="handler"></param>
-		public AsyncRelayCommand(Func<object, Task> handler)
+		public AsyncRelayCommand(Func<object, Task> handler, Func<object, bool> canExecuteCompare = null)
 		{
 			_handler = handler;
-		}
-
-		#region CanExecute를 다시 확인하도록하는 다른 방법
-		//private void SetCanExecute(bool canExecute)
-		//{
-		//	if (_canExecute != canExecute) {
-		//		_canExecute = canExecute;
-		//		RaiseCanExecuteChanged();
-		//	}
-		//}
-
-		//public event EventHandler CanExecuteChanged {
-		//	add { CommandManager.RequerySuggested += value; }
-		//	remove { CommandManager.RequerySuggested -= value; }
-		//}
-
-		///// <summary>
-		///// 비동기 작업 상태가 바뀌면 CanExecute를 다시 확인하도록...
-		///// </summary>
-		//private static void RaiseCanExecuteChanged()
-		//{
-		//	CommandManager.InvalidateRequerySuggested();
-		//}
-		#endregion
-
-		private void SetCanExecute(bool canExecute)
-		{
-			if (_canExecute != canExecute) {
-				_canExecute = canExecute;
-				CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-			}
+			_canExecuteCompare = canExecuteCompare;
+			_isRunning = false;
 		}
 
 		public event EventHandler CanExecuteChanged;
 
 		public bool CanExecute(object parameter)
 		{
-			return _canExecute;
+			return !_isRunning && (_canExecuteCompare?.Invoke(parameter) ?? true);
 		}
 
 		public async void Execute(object parameter)
 		{
-			if (CanExecute(null) == false) { return; }
-			if (_handler != null) {
-				SetCanExecute(false);
+			if (CanExecute(parameter) && _handler != null) {
+				_isRunning = true;
+				CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 				await _handler(parameter);
-				SetCanExecute(true);
+				_isRunning = false;
+				CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 	}
